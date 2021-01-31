@@ -1,8 +1,4 @@
-const routerBase = process.env.DEPLOY_ENV === 'GEN'
-      ?
-        '/bayasal-spa/'
-     :
-        '/';
+// const routerBase = process.env.DEPLOY_ENV === 'GEN' ? '/bayasal-spa/' : '/';
 
 export default {
   // Disable server-side rendering (https://go.nuxtjs.dev/ssr-mode)
@@ -12,7 +8,7 @@ export default {
   target: 'static',
 
   router: {
-    base: routerBase
+    base: "/bayasal-spa/"
   },
   
   // Global page headers (https://go.nuxtjs.dev/config-head)
@@ -52,7 +48,8 @@ export default {
   modules: [
     // https://go.nuxtjs.dev/axios
     '@nuxtjs/axios',
-    '@nuxtjs/auth-next'
+    '@nuxtjs/auth-next',
+    'bootstrap-vue/nuxt'
   ],
 
   auth: {
@@ -68,28 +65,35 @@ export default {
           // autoFetch: true
         },
         endpoints: {
-          login: { url: '/auth/login', method: 'post' },
-          logout: { url: '/auth/logout', method: 'post' },
+          login: { url: '/login', method: 'post' },
+          logout: { url: '/logout', method: 'post' },
           user: { url: '/me', method: 'get' }
         }
       }
     },
     redirect: {
-      login: '/auth/login',
+      login: '/login',
       home: '/'
     }
   },
 
   // Axios module configuration (https://go.nuxtjs.dev/config-axios)
   axios: {
-    baseURL: 'http://localhost:8000/api',
+    baseURL: 'https://v269mh6ua4.execute-api.ap-southeast-1.amazonaws.com/v1',
     // proxy: true
   },
 
+  vue: {
+    config: {
+      productionTip: false,
+      // devtools: false
+    }
+  },
+
   // proxy: {
-  //   '/api': {
-  //     target: 'http://localhost:8000',
-  //     pathRewrite: { '^/api' : '/' }
+  //   '/v1': {
+  //     target: 'https://v269mh6ua4.execute-api.ap-southeast-1.amazonaws.com',
+  //     pathRewrite: { '^/v1' : '/' }
   //   }
   // },
 
