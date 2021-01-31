@@ -1,3 +1,9 @@
+const routerBase = process.env.DEPLOY_ENV === 'GEN'
+      ?
+        '/bayasal-spa/'
+     :
+        '/';
+
 export default {
   // Disable server-side rendering (https://go.nuxtjs.dev/ssr-mode)
   ssr: false,
@@ -6,7 +12,7 @@ export default {
   target: 'static',
 
   router: {
-    base: '/bayasal-spa/'
+    base: routerBase
   },
   
   // Global page headers (https://go.nuxtjs.dev/config-head)
