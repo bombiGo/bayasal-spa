@@ -1,7 +1,7 @@
 <template>
   <div class="content p-3">
-    courses  {{ authenticated }}
-  </div> 
+  	recipes 
+  </div>
 </template>
 
 <script>
