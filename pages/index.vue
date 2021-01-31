@@ -1,6 +1,6 @@
 <template>
   <div class="content p-3">
-    courses  {{ authenticated }}
+    courses 2 {{ authenticated }}
   </div> 
 </template>
 
