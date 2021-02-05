@@ -5,16 +5,15 @@
 
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav v-if="authenticated">
-        <b-nav-item href="#">Хөтөлбөрүүд</b-nav-item>
+        <b-nav-item to="/courses">Хөтөлбөрүүд</b-nav-item>
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">
         <b-nav-item-dropdown right v-if="authenticated">
           <template #button-content>
-            <em>User</em>
+            <em>{{ user.email }}</em>
           </template>
-          <b-dropdown-item href="#">Profile</b-dropdown-item>
-          <b-dropdown-item href="#">Sign Out</b-dropdown-item>
+          <b-dropdown-item @click="logout">Гарах</b-dropdown-item>
         </b-nav-item-dropdown>
 
         <b-nav-item to="/auth/login" v-if="!authenticated" right>Нэвтрэх</b-nav-item>
@@ -24,5 +23,15 @@
 </template>
 
 <script>
-export default {}
+export default {
+  methods: {
+    async logout() {
+      try {
+        await this.$auth.logout();  
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  }
+}
 </script>

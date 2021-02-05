@@ -8,13 +8,21 @@
 
       <div class="mb-3">
         <label for="emailInput" class="form-label">Email address</label>
-        <input type="email" class="form-control" id="emailInput" v-model="login.email">
+        <input type="email" class="form-control" id="emailInput" v-model="login.email" required>
       </div>
+      
       <div class="mb-3">
         <label for="passwordInput" class="form-label">Password</label>
-        <input type="password" class="form-control" id="passwordInput" v-model="login.password">
+        <input type="password" class="form-control" id="passwordInput" v-model="login.password" required>
       </div>
-      <button class="btn btn-primary" type="submit">Нэвтрэх</button>
+
+      <button class="btn btn-primary" type="submit" v-if="!loading">Нэвтрэх</button>
+      
+      <b-button variant="primary" disabled v-if="loading">
+        <b-spinner small></b-spinner>
+        <span class="sr-only">Loading...</span>
+      </b-button>
+
     </form>
   </div>
 </template>
@@ -24,6 +32,7 @@ export default {
   middleware: ['guest'],
   data() {
     return {
+      loading : false,
       hasErrors: false,
       login: {
         username: '',
@@ -33,17 +42,22 @@ export default {
   },
   methods: {
     async userLogin() {
+      this.loading = true;
       this.hasErrors = false;
-      if (this.username == '' || this.username == '') {
-
+      if (this.username == '' || this.password == '') {
+        this.hasErrors = true;
       } else {
         try {
           let response = await this.$auth.loginWith('local', { data: this.login })
-          if (response.data.status) {
+          if (response.data.success) {
             this.$router.push({ path: '/' });
             console.log(response);  
+          } else {
+            this.hasErrors = true;
           }
+          this.loading = false;
         } catch (err) {
+          this.loading = false;
           this.hasErrors = true;
           console.log(err.response);
         }  

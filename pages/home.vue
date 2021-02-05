@@ -8,8 +8,9 @@
 
 <script>
 	export default {
+		middleware: ['auth'],
 		mounted() {
-      console.log("index page mounted!");
+      console.log("home page mounted!");
     }
 	};
 </script>

@@ -14,3 +14,9 @@ export default {
   }
 };
 </script>
+
+<style type="text/css">
+  html, body {
+    font-size: 14px;
+  }
+</style>

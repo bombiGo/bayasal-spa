@@ -1,5 +1,3 @@
-// const routerBase = process.env.DEPLOY_ENV === 'GEN' ? '/bayasal-spa/' : '/';
-
 export default {
   // Disable server-side rendering (https://go.nuxtjs.dev/ssr-mode)
   ssr: false,
@@ -34,6 +32,7 @@ export default {
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: [
+    { src: './plugins/vue-quill-editor.js', ssr: false },
     './plugins/mixins/user'
   ],
 
@@ -56,7 +55,7 @@ export default {
     strategies: {
       local: {
         token: {
-          property: 'access_token',
+          property: 'user.token',
           // required: true,
           // type: 'Bearer'
         },
@@ -71,8 +70,9 @@ export default {
         }
       }
     },
+
     redirect: {
-      login: '/login',
+      login: '/auth/login',
       home: '/'
     }
   },
