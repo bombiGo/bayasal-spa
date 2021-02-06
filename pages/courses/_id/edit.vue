@@ -9,13 +9,13 @@
 			    <li class="breadcrumb-item">
 			    	<nuxt-link to="/courses">Хөтөлбөрүүд</nuxt-link>
 			    </li>
-			    <li class="breadcrumb-item active" aria-current="page">Нэмэх</li>
+			    <li class="breadcrumb-item active" aria-current="page">Засах</li>
 			  </ol>
 			</nav>
 
-			<b-card bg-variant="light" text-variant="dark">
+			<b-card bg-variant="light" text-variant="dark" v-if="!isBusy">
 				<template #header>
-	        <h6 class="mb-0">Хөтөлбөр нэмэх</h6>
+	        <h6 class="mb-0">Хөтөлбөр засах</h6>
 	      </template>
 
 				<b-form @submit.prevent="onSubmit">
@@ -31,10 +31,13 @@
 			      <b-form-file
 			      	id="input-2"
 				      v-model="form.image"
-				      required
 				    >
 				    </b-form-file>
 			    </b-form-group>
+
+          <div class="m-3" v-if="imageSrc">
+            <img :src="imageSrc" class="img-fluid" width="200" />
+          </div>
 			    
 		      <b-form-group id="input-group-3" label="Үнэ" label-for="input-3">
 		        <b-form-input
@@ -92,6 +95,7 @@
           </b-button>
 		    </b-form>
 		  </b-card>
+      <p v-if="isBusy">Уншиж байна</p>
 		</div>
 	</div>
 </template>
@@ -124,6 +128,7 @@
             }
           }
         },
+        isBusy: false,
         loading: false,
         form: {
           title: '',
@@ -134,19 +139,41 @@
           day1: '',
           day2: ''
         },
+        imageSrc: '' 
       }
     },
+    created() {
+      this.fetchData();
+    },
     methods: {
+      async fetchData() {
+        this.isBusy = true;
+
+        try {
+          let response = await this.$axios.get("/courses/edit?id=" + this.$route.params.id);
+          if (response.data) {
+            this.setFormData(response.data);
+          } 
+          this.isBusy = false;
+        } catch (err) {
+          this.isBusy = false;
+          console.log(err);
+        }
+      },
       async onSubmit() {
         this.loading = true;
         const headers = {
           'Content-Type': 'multipart/form-data',
         };
         const paid = this.form.paid ? "paid" : "free";
+        const uploadedImage = this.form.image ? "uploaded" : "no_upload";
 
         let formData = new FormData();
+        formData.append("id", this.$route.params.id);
         formData.append("title", this.form.title);
         formData.append("image", this.form.image);
+        formData.append("image_upload", uploadedImage);
+        formData.append("old_image", this.imageSrc);
         formData.append("price", this.form.price);
         formData.append("paid", paid);
         formData.append("content", this.form.content);
@@ -154,22 +181,34 @@
         formData.append("day2", this.form.day2);
 
         try {
-          let response = await this.$axios.post("/courses", formData, headers);
-          console.log(response);
-          this.loading = false;
-
+          let response = await this.$axios.post("/courses/edit", formData, headers);
+          
           if (response.data.success) {
             this.$router.push({ path: '/courses' });
           } else {
-            alert("Course delete error");
+            alert("Course update error");
           }
+          this.loading = false;
+          console.log(response);
         } catch (err) {
           this.loading = false;
           console.log(err);
         }
+        
       },
       onEditorChange({editor,html,text}){
         this.form.content = html
+      },
+      setFormData(data) {
+        this.form.title = data.title.S;
+        this.form.price = data.price.S;
+        this.form.paid = data.paid.BOOL;
+        this.form.content = data.content.S;
+        this.form.day1 = data.day1.S;
+        this.form.day2 = data.day2.S;
+        this.imageSrc = data.image.S;
+       
+        console.log(data);
       }
     }
   }
