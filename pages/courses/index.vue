@@ -22,12 +22,14 @@
                 <td>
                   <img :src="course.image.S" width="100" class="img-fluid"/>
                 </td>
-                <td>{{ course.title.S }}</td>
+                <td>
+                  <nuxt-link :to="{ name: 'courses-id-show', params: { id: course.id.S } }">{{ course.title.S }}</nuxt-link>
+                </td>
                 <td>
                   <strong>{{ course.price.S | formatPrice }}</strong>
                 </td>
                 <td>
-                  <b-badge pill variant="info" class="p-2">{{ course.day1.S }}</b-badge>
+                  <b-badge pill variant="info" class="p-2">{{ course.day1.S }} өдөр</b-badge>
                 </td>
                 <td>
                   <b-button variant="primary" size="sm" class="mb-2" :to="{ name: 'courses-id-edit', params: { id: course.id.S } }">Засах</b-button>

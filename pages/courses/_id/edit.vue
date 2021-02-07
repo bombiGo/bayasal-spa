@@ -53,9 +53,15 @@
 		      </b-form-checkbox>
 
           <b-row class="mt-3">
-            <b-col>
+            <b-col sm="4">
+              <b-form-group id="input-group-5" label="Өдөр сонгох" label-for="input-5">
+                <b-form-select v-model="form.dayMode" :options="dayOptions"></b-form-select>
+              </b-form-group>
+            </b-col>
+            <b-col sm="4">
               <b-form-group id="input-group-4" label="Өдөр" label-for="input-4">
                 <b-form-input
+                  type="number"
                   id="input-4"
                   v-model="form.day1"
                   required
@@ -63,7 +69,7 @@
                 ></b-form-input>
               </b-form-group>
             </b-col>
-            <b-col>
+            <b-col sm="4">
               <b-form-group id="input-group-4" label="Өдөр гарчиг" label-for="input-4">
                 <b-form-input
                   id="input-4"
@@ -128,6 +134,10 @@
             }
           }
         },
+        dayOptions: [
+          { value: 'select', text: 'Жагсаалт' },
+          { value: 'calendar', text: 'Календарь' }
+        ],
         isBusy: false,
         loading: false,
         form: {
@@ -136,6 +146,7 @@
           image: null,
           paid: false,
           content: '',
+          dayMode: '',
           day1: '',
           day2: ''
         },
@@ -177,6 +188,7 @@
         formData.append("price", this.form.price);
         formData.append("paid", paid);
         formData.append("content", this.form.content);
+        formData.append("dayMode", this.form.dayMode);
         formData.append("day1", this.form.day1);
         formData.append("day2", this.form.day2);
 
@@ -200,13 +212,14 @@
         this.form.content = html
       },
       setFormData(data) {
-        this.form.title = data.title.S;
-        this.form.price = data.price.S;
-        this.form.paid = data.paid.BOOL;
-        this.form.content = data.content.S;
-        this.form.day1 = data.day1.S;
-        this.form.day2 = data.day2.S;
-        this.imageSrc = data.image.S;
+        this.form.title = data.title ? data.title.S : "";
+        this.form.price = data.price ? data.price.S : "";
+        this.form.paid = data.paid ? data.paid.BOOL : false;
+        this.form.content = data.content ? data.content.S : "";
+        this.form.dayMode = data.dayMode ? data.dayMode.S : "select";
+        this.form.day1 = data.day1 ? data.day1.S : "";
+        this.form.day2 = data.day2 ? data.day2.S : "";
+        this.imageSrc = data.image ? data.image.S : "";
        
         console.log(data);
       }
