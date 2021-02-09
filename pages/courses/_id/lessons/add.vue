@@ -80,13 +80,34 @@
               placeholder="Pdf, excel, image ..."
             ></b-form-file>
           </b-form-group>
+
+          <b-form-group
+            id="input-duration"
+            label="Хугацаа/Хэмжээ"
+          >
+            <b-form-input
+              id="input-youtube"
+              v-model="form.duration"
+              type="text"
+              placeholder="Файл - 10 миниут, 3kb"
+            ></b-form-input>
+          </b-form-group>
           
+          <b-form-checkbox
+            id="checkbox-lesson"
+            v-model="form.locked"
+            value="locked"
+            unchecked-value="unlocked"
+          >
+            Хичээл түгжих / нээх
+          </b-form-checkbox>
+
           <div class="mt-3" :style="{'opacity': editorOpacity + ' !important', 'pointer-events': editorPointerEvents}">
             <div class="quill-editor"
                :content="form.content"
                v-quill:myQuillEditor="editorOption"
                @change="onEditorChange($event)"
-               :style="{'height': editorHeight + 'px'}">
+               :style="{'height': editorHeight + 'px'}" style="background-color: white;">
             </div>
           </div>
         </b-card>
@@ -142,7 +163,9 @@
           dayCalendar: "",
           content: "",
           file: null,
-          youtube: ""
+          youtube: "",
+          duration: "",
+          locked: "locked"
         }
       }
     },
@@ -186,13 +209,18 @@
         formData.append("fileUpload", uploadedFile);
         formData.append("content", this.form.content);
         formData.append("youtube", this.form.youtube);
+        formData.append("contentMode", this.contentSelected);
         formData.append("content", this.form.content);
         formData.append("dayNumber", this.form.dayNumber);
         formData.append("dayCalendar", this.form.dayCalendar);
+        formData.append("locked", this.form.locked);
+        formData.append("duration", this.form.duration);
 
         try {
           let response = await this.$axios.post("/lessons", formData, headers);
-          console.log(response);
+          if (response.data.success) {
+            this.$router.push({ name: 'courses-id-show', params: { id: this.$route.params.id }});
+          }
           this.loading = false;
         } catch (err) {
           this.loading = false;

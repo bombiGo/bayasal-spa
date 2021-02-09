@@ -18,7 +18,7 @@
           </thead>
           <tbody>
             <template v-if="!loading">
-              <tr v-for="course in courses">
+              <tr v-for="course in courses" :key="course.id.S">
                 <td>
                   <img :src="course.image.S" width="100" class="img-fluid"/>
                 </td>
@@ -126,7 +126,8 @@
             this.deleteCourse.isBusy = false;
             
             if (response.data.success) {
-              window.location.reload();
+              this.$refs["delete-modal"].hide();
+              this.fetchData();
             } else {
               alert("Course delete error");
             }

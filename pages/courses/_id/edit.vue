@@ -87,7 +87,7 @@
                :content="form.content"
                v-quill:myQuillEditor="editorOption"
                @change="onEditorChange($event)"
-               style="height: 250px;">
+               style="height: 250px; background-color: white;">
             </div>
           </div>
 
