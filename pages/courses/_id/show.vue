@@ -68,6 +68,19 @@
             <b-button pill variant="success" size="sm" class="mt-1"
               :to="{ name: 'courses-id-lessons-add', params: { id: course.id.S }, query: { title: course.title.S, dayMode: course.dayMode.S, dayNumber: course.day1.S } }"
             >Хичээл нэмэх</b-button>
+
+            <table class="table table-striped mt-3">
+              <tr v-for="lesson in course.lessons" :key="lesson.id.S">
+                <td>
+                  <div>{{ lesson.title.S }}</div> 
+                  <b-badge variant="primary">
+                    <span v-if="course.dayMode.S === 'select'">
+                      {{ lesson.dayNumber.S }} өдөр
+                    </span>
+                  </b-badge>
+                </td>
+              </tr>
+            </table>
           </b-card>
         </b-col>
       </b-row>
