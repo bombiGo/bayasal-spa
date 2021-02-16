@@ -6,6 +6,10 @@
     <b-collapse id="nav-collapse" is-nav>
       <b-navbar-nav v-if="authenticated">
         <b-nav-item to="/courses">Хөтөлбөрүүд</b-nav-item>
+        <b-nav-item-dropdown text="Мэдээлэл">
+          <b-dropdown-item to="/info-categories">Ангилалууд</b-dropdown-item>
+          <b-dropdown-item to="/infos">Бүх мэдээлэлүүд</b-dropdown-item>
+        </b-nav-item-dropdown>
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">
@@ -35,3 +39,13 @@ export default {
   }
 }
 </script>
+
+<style>
+  #nav-collapse .nav-link.nuxt-link-active {
+    color: #fff !important;
+  }
+
+  #nav-collapse .dropdown-item.nuxt-link-active {
+    font-weight: bold !important;
+  }
+</style>
