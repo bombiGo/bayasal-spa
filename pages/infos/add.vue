@@ -32,7 +32,7 @@
             </b-col>
           </b-row>
 
-		      <b-form-group id="input-group-1" label="Хөтөлбөрийн нэр" label-for="input-1">
+		      <b-form-group id="input-group-1" label="Мэдээлэлийн нэр" label-for="input-1">
 		        <b-form-input
 		          id="input-1"
 		          v-model="form.title"
@@ -148,30 +148,31 @@
           'Content-Type': 'multipart/form-data',
         };
 
+        const uploadedFile = this.form.image ? "uploaded" : "no_upload";
+
         let formData = new FormData();
-        formData.append("categoryId", "category_1234");
+        formData.append("categoryId", this.form.categoryId);
         formData.append("infoType", this.form.infoType);
         formData.append("title", this.form.title);
         formData.append("subtitle", this.form.subtitle);
-        formData.append("image", this.form.image);
         formData.append("content", this.form.content);
+        formData.append("uploadedFile", uploadedFile);
+        formData.append("file", this.form.image);
+        
+        try {
+          let response = await this.$axios.post("/infos", formData, headers);
+          console.log(response);
+          this.loading = false;
 
-        console.log(this.form);
-
-        // try {
-        //   let response = await this.$axios.post("/courses", formData, headers);
-        //   console.log(response);
-        //   this.loading = false;
-
-        //   if (response.data.success) {
-        //     this.$router.push({ path: '/courses' });
-        //   } else {
-        //     alert("Course delete error");
-        //   }
-        // } catch (err) {
-        //   this.loading = false;
-        //   console.log(err);
-        // }
+          if (response.data.success) {
+            this.$router.push({ path: '/infos' });
+          } else {
+            alert("Info create delete error");
+          }
+        } catch (err) {
+          this.loading = false;
+          console.log(err);
+        }
       },
       onEditorChange({editor,html,text}){
         this.form.content = html

@@ -24,7 +24,7 @@
                 <h5>{{ course.title.S }}</h5>
               </li>
               <li class="mb-3">
-                <img :src="course.image.S" class="img-fluid" style="max-width: 200px;" />
+                <img :src="course.image.S" class="img-fluid" style="max-width: 300px;" />
               </li>
               <li class="mb-0">
                 <p class="day m-0">

@@ -1,7 +1,7 @@
 <template>
 	<div class="container-fliud">
 		<div class="content p-3">
-      <h5>Нийт мэдээлэлүүд</h5>
+      <h5>Нийт мэдээлэлүүд ({{ infos.length }})</h5>
 
       <b-button pill variant="success" class="mt-3" to="/infos/add">Мэдээлэл нэмэх</b-button>
 
@@ -11,6 +11,8 @@
             <tr>
               <th scope="col">Зураг</th>
               <th scope="col">Нэр</th>
+              <th scope="col">Ангилал</th>
+              <th scope="col">Онцлох</th>
               <th scope="col"></th>
             </tr>
           </thead>
@@ -24,6 +26,21 @@
                   <nuxt-link :to="{ name: 'infos-id-show', params: { id: info.PK.S } }">
                     {{ info.title.S }}
                   </nuxt-link>
+                </td>
+                <td>
+                  <b-badge variant="info" v-if="info.type.S == 'category_news'">
+                    Мэдээлэл
+                  </b-badge>
+                  <b-badge variant="secondary" v-if="info.type.S == 'category_advice'">
+                    Зөвлөмж
+                  </b-badge>
+                  <b-badge variant="warning" v-if="info.type.S == 'category_exercise'">
+                    Дасгал
+                  </b-badge>
+                </td>
+                <td>
+                  <span v-if="info.featured">Тийм</span>
+                  <span v-else>Үгүй</span>
                 </td>
                 <td>
                   <b-button variant="primary" size="sm" class="mb-2" :to="{ name: 'infos-id-edit', params: { id: info.PK.S } }">Засах</b-button>
@@ -101,7 +118,9 @@
           let response = await this.$axios.get("/infos");
           this.loading = false;
 
-          this.courses = response.data.map(data => data.SK.S === "info");
+          this.infos = response.data.filter(data => {
+            return data.SK.S === "info"; 
+          });
 
           const categories = response.data.filter(data => {
             return data.SK.S === "category"; 
