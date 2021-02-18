@@ -3,7 +3,7 @@
 		<div class="content p-3">
       <h5>Нийт мэдээлэлүүд ({{ infos.length }})</h5>
 
-      <b-button pill variant="success" class="mt-3" to="/infos/add">Мэдээлэл нэмэх</b-button>
+      <b-button pill variant="success" class="mt-3" to="/infos/add" v-if="!loading">Мэдээлэл нэмэх</b-button>
 
       <div class="table-responsive mt-3">
   			<table class="table">
@@ -11,6 +11,7 @@
             <tr>
               <th scope="col">Зураг</th>
               <th scope="col">Нэр</th>
+              <th scope="col">Төрөл</th>
               <th scope="col">Ангилал</th>
               <th scope="col">Онцлох</th>
               <th scope="col"></th>
@@ -20,7 +21,7 @@
             <template v-if="!loading">
               <tr v-for="info in infos" :key="info.PK.S">
                 <td>
-                  <img :src="info.image.S" width="100" class="img-fluid"/>
+                  <img :src="info.image.S" style="max-width: 100px;" class="img-fluid"/>
                 </td>
                 <td>
                   <nuxt-link :to="{ name: 'infos-id-show', params: { id: info.PK.S } }">
@@ -39,7 +40,10 @@
                   </b-badge>
                 </td>
                 <td>
-                  <span v-if="info.featured">Тийм</span>
+                  {{ getCategoryName(info.categoryId.S) }}
+                </td>
+                <td>
+                  <span v-if="info.featured && info.featured.BOOL">Тийм</span>
                   <span v-else>Үгүй</span>
                 </td>
                 <td>
@@ -58,10 +62,10 @@
       <b-modal 
         ref="delete-modal" 
         size="sm" 
-        title="Хөтөлбөрийг устгах уу"
+        title="Мэдээлэл устгах уу"
         
       >
-        <input type="text" v-model="deleteCourse.confirmMessage" placeholder="permanently delete" class="form-control">
+        <input type="text" v-model="deleteInfo.confirmMessage" placeholder="permanently delete" class="form-control">
         <template #modal-footer>
           <div class="w-100">
             <b-button
@@ -69,11 +73,11 @@
               size="md"
               class="float-right"
               @click="deleteOk"
-              :disabled="deleteCourse.disabled"
+              :disabled="deleteInfo.disabled"
             >
-              <b-spinner small v-if="deleteCourse.isBusy"></b-spinner>
-              <span class="sr-only" v-if="deleteCourse.isBusy">Loading...</span>
-              <span v-if="!deleteCourse.isBusy">Устгах</span>
+              <b-spinner small v-if="deleteInfo.isBusy"></b-spinner>
+              <span class="sr-only" v-if="deleteInfo.isBusy">Loading...</span>
+              <span v-if="!deleteInfo.isBusy">Устгах</span>
             </b-button>
           </div>
         </template>
@@ -89,10 +93,10 @@
       return {
         loading: false,
         infos: [],
-        deleteCourse: {
+        deleteInfo: {
           confirmMessage: "",
           isBusy: false,
-          id: "",
+          pk: "",
           disabled: true
         }
       }
@@ -127,8 +131,6 @@
           });
           
           this.$store.commit('setInfoCategories', categories);
-
-          console.log(response);
         } catch (err) {
           this.loading = false;
           console.log(err);
@@ -138,38 +140,51 @@
         this.deleteInfo.pk = pk;
         this.$refs["delete-modal"].show();
       },
+      getCategoryName(value) {
+        let loop = true;
+        let categoryName = "";
+        this.$store.getters.infoCategories.forEach(category => {
+          if (category.PK && category.PK.S && loop && category.PK.S == value) {
+            categoryName = category.title.S;
+            loop = false;
+          }
+        });
+
+        return categoryName;
+      },
       async deleteOk(bvModalEvt) {
         bvModalEvt.preventDefault();
 
-        // if (this.deleteInfo.id) {
-        //   this.deleteInfo.isBusy = true;
-        //   try {
-        //     let response = await this.$axios.delete("/courses/single-delete?id=" + this.deleteCourse.id);
-        //     this.deleteCourse.isBusy = false;
+        if (this.deleteInfo.pk) {
+          this.deleteInfo.confirmMessage = "";
+          this.deleteInfo.isBusy = true;
+          try {
+            let response = await this.$axios.delete("/infos?pk=" + this.deleteInfo.pk);
+            this.deleteInfo.isBusy = false;
             
-        //     if (response.data.success) {
-        //       this.$refs["delete-modal"].hide();
-        //       this.fetchData();
-        //     } else {
-        //       alert("Course delete error");
-        //     }
-        //     console.log(response);
+            if (response.data.success) {
+              this.$refs["delete-modal"].hide();
+              this.fetchData();
+            } else {
+              alert("Info delete error");
+            }
+            console.log(response);
 
-        //   } catch (err) {
-        //     this.deleteCourse.isBusy = false;
-        //     console.log(err);
-        //   }
-        // } else {
-        //   alert("Delete action error");
-        // }
+          } catch (err) {
+            this.deleteInfo.isBusy = false;
+            console.log(err);
+          }
+        } else {
+          alert("Info delete error");
+        }
       }
     },
     watch: {
-      "deleteCourse.confirmMessage": function(value) {
+      "deleteInfo.confirmMessage": function(value) {
         if (value === "permanently delete") {
-          this.deleteCourse.disabled = false;
+          this.deleteInfo.disabled = false;
         } else {
-          this.deleteCourse.disabled = true;
+          this.deleteInfo.disabled = true;
         }
       }
     }

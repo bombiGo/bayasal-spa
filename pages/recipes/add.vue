@@ -7,7 +7,7 @@
 			    	<nuxt-link to="/home">Нүүр</nuxt-link>
 			    </li>
 			    <li class="breadcrumb-item">
-			    	<nuxt-link to="/infos">Мэдээлэлүүд</nuxt-link>
+			    	<nuxt-link to="/recipes">Жорууд</nuxt-link>
 			    </li>
 			    <li class="breadcrumb-item active" aria-current="page">Нэмэх</li>
 			  </ol>
@@ -15,24 +15,22 @@
 
 			<b-card bg-variant="light" text-variant="dark">
 				<template #header>
-	        <h6 class="mb-0">Мэдээлэл нэмэх</h6>
+	        <h6 class="mb-0">Жор нэмэх</h6>
 	      </template>
 
 				<b-form @submit.prevent="onSubmit">
-          <b-row>
-            <b-col sm="6">
-              <b-form-group id="info-type" label="Төрөл сонгох" label-for="info-type">
-                <b-form-select v-model="form.infoType" :options="infoOptions"></b-form-select>
-              </b-form-group>
-            </b-col>
-            <b-col sm="6">
-              <b-form-group id="info-type" label="Ангилал сонгох" label-for="info-type">
-                <b-form-select v-model="form.categoryId" :options="categories"></b-form-select>
-              </b-form-group>
-            </b-col>
-          </b-row>
+          <b-form-group label="Ангилал сонгох">
+            <multiselect 
+              v-model="form.categoryValues" 
+              label="text" 
+              track-by="value"
+              :options="categoryOptions" 
+              :multiple="true" 
+              :taggable="true"
+            ></multiselect>
+          </b-form-group>
 
-		      <b-form-group id="input-group-1" label="Мэдээлэлийн нэр" label-for="input-1">
+		      <b-form-group id="input-group-1" label="Жорын нэр" label-for="input-1">
 		        <b-form-input
 		          id="input-1"
 		          v-model="form.title"
@@ -40,13 +38,13 @@
 		        ></b-form-input>
 		      </b-form-group>
 
-          <b-form-group id="subtitle" label="Дэд тайлбар" label-for="subtitle">
-            <b-form-textarea
+          <b-form-group id="subtitle" label="Жорын тайлбар" label-for="subtitle">
+            <b-form-input
               id="subtitle"
               v-model="form.subtitle"
               rows="3"
               max-rows="6"
-            ></b-form-textarea>
+            ></b-form-input>
           </b-form-group>
 
 		      <b-form-group id="input-group-2" label="Зураг оруулах" label-for="input-2">
@@ -57,16 +55,7 @@
 				    >
 				    </b-form-file>
 			    </b-form-group>
-			    
-          <b-form-checkbox 
-            v-model="form.featured" 
-            switch
-            value="accepted"
-            unchecked-value="not_accepted"
-          >
-            Онцлох болгох
-          </b-form-checkbox>
-
+			   
           <div class="mt-3">
             <label>Дэлгэрэнгүй</label>
   		      <div class="quill-editor"
@@ -92,7 +81,13 @@
 </template>
 
 <script>
+
+  import Multiselect from 'vue-multiselect';
+
 	export default {
+    components: {
+      Multiselect
+    },
     data() {
       return {
         editorOption: {
@@ -119,29 +114,28 @@
             }
           }
         },
-        infoOptions: [
-          { value: "category_news", text: "Мэдээлэл" },
-          { value: "category_advice", text: "Зөвлөмж" },
-          { value: "category_exercise", text: "Дасгал хөдөлгөөн" }
-        ],
-        categories: [],
+        categoryOptions: [],
         loading: false,
         form: {
           title: "",
           subtitle: "",
           image: null,
-          infoType: "category_news",
-          categoryId: "",
-          content: "",
-          featured: "not_accepted"
-        },
+          categoryValues: [],
+          content: ""
+        }
       }
     },
     created() {
-      this.updateCategories("category_news");
+      this.$store.getters.recipeCategories.forEach(category => {
+        this.categoryOptions.push({
+          text: category.title.S,
+          value: category.PK.S
+        })
+      });
     },
     methods: {
       async onSubmit() {
+
         this.loading = true;
         
         const headers = {
@@ -151,24 +145,22 @@
         const uploadedFile = this.form.image ? "uploaded" : "no_upload";
 
         let formData = new FormData();
-        formData.append("categoryId", this.form.categoryId);
-        formData.append("infoType", this.form.infoType);
+        formData.append("categoryValues", JSON.stringify(this.form.categoryValues));
         formData.append("title", this.form.title);
         formData.append("subtitle", this.form.subtitle);
         formData.append("content", this.form.content);
         formData.append("uploadedFile", uploadedFile);
-        formData.append("featured", this.form.featured);
         formData.append("file", this.form.image);
         
         try {
-          let response = await this.$axios.post("/infos", formData, headers);
+          let response = await this.$axios.post("/recipes", formData, headers);
           console.log(response);
           this.loading = false;
 
           if (response.data.success) {
-            this.$router.push({ path: '/infos' });
+            this.$router.push({ path: '/recipes' });
           } else {
-            alert("Info create delete error");
+            alert("Recipe create delete error");
           }
         } catch (err) {
           this.loading = false;
@@ -177,22 +169,6 @@
       },
       onEditorChange({editor,html,text}){
         this.form.content = html
-      },
-      updateCategories(categoryType) {
-        this.$store.getters.infoCategories.forEach(category => {
-          if (category.type.S == categoryType) {
-            this.categories.push({
-              value: category.PK.S,
-              text: category.title.S
-            });  
-          }
-        });
-      }
-    },
-    watch: {
-      "form.infoType": function(value) {
-        this.categories = [];
-        this.updateCategories(value);
       }
     }
   }

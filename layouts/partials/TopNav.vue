@@ -10,6 +10,10 @@
           <b-dropdown-item to="/info-categories">Ангилалууд</b-dropdown-item>
           <b-dropdown-item to="/infos">Бүх мэдээлэлүүд</b-dropdown-item>
         </b-nav-item-dropdown>
+        <b-nav-item-dropdown text="Жор">
+          <b-dropdown-item to="/recipe-categories">Ангилалууд</b-dropdown-item>
+          <b-dropdown-item to="/recipes">Бүх жорууд</b-dropdown-item>
+        </b-nav-item-dropdown>
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">

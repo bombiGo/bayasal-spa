@@ -40,7 +40,7 @@
 			    </b-form-group>
 
           <div class="m-3" v-if="imageSrc">
-            <img :src="imageSrc" class="img-fluid" width="100" />
+            <img :src="imageSrc" class="img-fluid" style="max-width: 100px;" />
           </div>
 
           <b-button variant="primary" type="submit" class="mt-3" v-if="!loading">

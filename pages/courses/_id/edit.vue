@@ -36,7 +36,7 @@
 			    </b-form-group>
 
           <div class="m-3" v-if="imageSrc">
-            <img :src="imageSrc" class="img-fluid" width="200" />
+            <img :src="imageSrc" class="img-fluid" style="max-width: 200px;" />
           </div>
 			    
 		      <b-form-group id="input-group-3" label="Үнэ" label-for="input-3">

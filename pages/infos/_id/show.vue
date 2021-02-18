@@ -26,19 +26,25 @@
               <li class="mb-3" v-if="info.image && info.image.S">
                 <img :src="info.image.S" class="img-fluid" style="max-width: 300px;" />
               </li>
-               <li class="mb-0">
+              <li class="mb-0">
                 <p>
-                  <span class="text-muted">Ангилал: </span> 
-                    <b-badge variant="info" v-if="info.type.S == 'category_news'">
-                      Мэдээлэл
-                    </b-badge>
-                    <b-badge variant="secondary" v-if="info.type.S == 'category_advice'">
-                      Зөвлөмж
-                    </b-badge>
-                    <b-badge variant="warning" v-if="info.type.S == 'category_exercise'">
-                      Дасгал
-                    </b-badge>                
-                  </p>
+                  <span class="text-muted">Төрөл: </span> &nbsp;
+                  <b-badge variant="info" v-if="info.type.S == 'category_news'">
+                    Мэдээлэл
+                  </b-badge>
+                  <b-badge variant="secondary" v-if="info.type.S == 'category_advice'">
+                    Зөвлөмж
+                  </b-badge>
+                  <b-badge variant="warning" v-if="info.type.S == 'category_exercise'">
+                    Дасгал
+                  </b-badge>                
+                </p>
+              </li>
+              <li class="mb-0">
+                <p>
+                  <span class="text-muted">Ангилалын нэр: </span> 
+                  <span>{{ getCategoryName(info.categoryId.S) }}</span>
+                </p>
               </li>
               <li class="mb-0">
                 <p>
@@ -94,8 +100,19 @@
           this.loading = false;
           console.log(err);
         }
-      }
+      },
+      getCategoryName(value) {
+        let loop = true;
+        let categoryName = "";
+        this.$store.getters.infoCategories.forEach(category => {
+          if (category.PK && category.PK.S && loop && category.PK.S == value) {
+            categoryName = category.title.S;
+            loop = false;
+          }
+        });
+
+        return categoryName;
+      },
     }
   }
 </script>
-

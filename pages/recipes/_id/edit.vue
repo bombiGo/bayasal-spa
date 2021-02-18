@@ -7,7 +7,7 @@
             <nuxt-link to="/home">Нүүр</nuxt-link>
           </li>
           <li class="breadcrumb-item">
-            <nuxt-link to="/infos">Мэдээлэлүүд</nuxt-link>
+            <nuxt-link to="/recipes">Жорууд</nuxt-link>
           </li>
           <li class="breadcrumb-item active" aria-current="page">Засах</li>
         </ol>
@@ -19,20 +19,18 @@
         </template>
 
         <b-form @submit.prevent="onSubmit">
-          <b-row>
-            <b-col sm="6">
-              <b-form-group id="info-type" label="Төрөл сонгох" label-for="info-type">
-                <b-form-select v-model="form.infoType" :options="infoOptions"></b-form-select>
-              </b-form-group>
-            </b-col>
-            <b-col sm="6">
-              <b-form-group id="info-type" label="Ангилал сонгох" label-for="info-type">
-                <b-form-select v-model="form.categoryId" :options="categories"></b-form-select>
-              </b-form-group>
-            </b-col>
-          </b-row>
+          <b-form-group label="Ангилал сонгох">
+            <multiselect 
+              v-model="form.categoryValues" 
+              label="text" 
+              track-by="value"
+              :options="categoryOptions" 
+              :multiple="true" 
+              :taggable="true"
+            ></multiselect>
+          </b-form-group>
 
-          <b-form-group id="input-group-1" label="Мэдээлэлийн нэр" label-for="input-1">
+          <b-form-group id="input-group-1" label="Жорын нэр" label-for="input-1">
             <b-form-input
               id="input-1"
               v-model="form.title"
@@ -61,14 +59,6 @@
             <img :src="imageSrc" class="img-fluid" style="max-width:200px;" />
           </div>
           
-          <b-form-checkbox 
-            v-model="form.featured" 
-            switch
-            value="accepted"
-            unchecked-value="not_accepted"
-          >
-            Онцлох болгох
-          </b-form-checkbox>
 
           <div class="mt-3">
             <label>Дэлгэрэнгүй</label>
@@ -96,7 +86,11 @@
 </template>
 
 <script>
+  import Multiselect from 'vue-multiselect';
   export default {
+    components: {
+      Multiselect
+    },
     data() {
       return {
         editorOption: {
@@ -123,35 +117,37 @@
             }
           }
         },
-        infoOptions: [
-          { value: "category_news", text: "Мэдээлэл" },
-          { value: "category_advice", text: "Зөвлөмж" },
-          { value: "category_exercise", text: "Дасгал хөдөлгөөн" }
-        ],
-        categories: [],
+        categoryOptions: [],
         isBusy: false,
         loading: false,
         form: {
           title: "",
           subtitle: "",
           image: null,
-          infoType: "",
-          categoryId: "",
+          categoryValues: [],
           content: "",
-          featured: "not_accepted"
         },
         imageSrc: '' 
       }
     },
     created() {
       this.fetchData();
+      this.updateCategories();
     },
     methods: {
+      updateCategories() {
+        this.$store.getters.recipeCategories.forEach(category => {
+          this.categoryOptions.push({
+            text: category.title.S,
+            value: category.PK.S
+          })
+        });
+      },
       async fetchData() {
         this.isBusy = true;
 
         try {
-          let response = await this.$axios.get("/infos/edit?pk=" + this.$route.params.id);
+          let response = await this.$axios.get("/recipes/edit?pk=" + this.$route.params.id);
           if (response.data) {
             this.setFormData(response.data);
           } 
@@ -172,25 +168,23 @@
 
         let formData = new FormData();
         formData.append("pk", this.$route.params.id);
-        formData.append("categoryId", this.form.categoryId);
-        formData.append("infoType", this.form.infoType);
+        formData.append("categoryValues", JSON.stringify(this.form.categoryValues));
         formData.append("title", this.form.title);
         formData.append("subtitle", this.form.subtitle);
         formData.append("content", this.form.content);
-        formData.append("featured", this.form.featured);
         formData.append("uploadedFile", uploadedFile);
         formData.append("file", this.form.image);
         formData.append("oldFile", this.imageSrc);
         
         try {
-          let response = await this.$axios.post("/infos/edit", formData, headers);
+          let response = await this.$axios.post("/recipes/edit", formData, headers);
           console.log(response);
           this.loading = false;
 
           if (response.data.success) {
-            this.$router.push({ path: '/infos' });
+            this.$router.push({ path: '/recipes' });
           } else {
-            alert("Info update error");
+            alert("Recipe update error");
           }
         } catch (err) {
           this.loading = false;
@@ -201,27 +195,27 @@
         this.form.content = html
       },
       setFormData(data) {
-        this.form.infoType = data.type ? data.type.S : "";
         this.form.title = data.title ? data.title.S : "";
         this.form.subtitle = data.subtitle ? data.subtitle.S : "";
         this.form.content = data.content ? data.content.S : "";
-        this.form.categoryId = data.categoryId ? data.categoryId.S : "";
         this.imageSrc = data.image ? data.image.S : "";
 
-        if (data.featured && data.featured.BOOL) {
-          this.form.featured = "accepted";
+        if (data.categoryValues && data.categoryValues.L) {
+          data.categoryValues.L.forEach(categoryValue => {
+            this.form.categoryValues.push({
+              text: categoryValue.M.text.S,
+              value: categoryValue.M.value.S,
+            })
+          });
         }
-
         console.log(data);
       },
-      updateCategories(categoryType) {
-        this.$store.getters.infoCategories.forEach(category => {
-          if (category.type.S == categoryType) {
-            this.categories.push({
-              value: category.PK.S,
-              text: category.title.S
-            });  
-          }
+      updateCategories() {
+        this.$store.getters.recipeCategories.forEach(category => {
+          this.categoryOptions.push({
+            text: category.title.S,
+            value: category.PK.S
+          });
         });
       }
     },

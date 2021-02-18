@@ -1,5 +1,6 @@
 export const state = () => ({
-  infoCategories: []
+  infoCategories: [],
+  recipeCategories: []
 });
 
 export const getters = {
@@ -13,11 +14,18 @@ export const getters = {
 
   infoCategories(state) {
     return state.infoCategories;
+  },
+
+  recipeCategories(state) {
+    return state.recipeCategories;
   }
 };
 
 export const mutations = {
   setInfoCategories(state, data) {
     state.infoCategories = data;
+  },
+  setRecipeCategories(state, data) {
+    state.recipeCategories = data;
   }
 };
