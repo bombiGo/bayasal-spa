@@ -35,11 +35,9 @@
               <li class="mb-0">
                 <p>
                   <span class="text-muted">Ангилалууд: </span> 
-                  <div v-if="recipe.categoryValues && recipe.categoryValues">
-                    <b-badge variant="info" v-for="(categoryValue, index) in recipe.categoryValues.L" :key="index" class="mr-2">
-                      <span v-if="categoryValue && categoryValue.M">
-                        {{ categoryValue.M.text.S }}
-                      </span>
+                  <div v-if="getCategoryNames(recipe.categories) && getCategoryNames(recipe.categories).length > 0">
+                    <b-badge variant="info" v-for="(categoryName, index) in getCategoryNames(recipe.categories)" :key="index" class="mr-2">
+                      <span>{{ categoryName }}</span>
                     </b-badge>
                   </div>
                 </p>
@@ -86,18 +84,20 @@
           console.log(err);
         }
       },
-      getCategoryName(value) {
+      getCategoryNames(categories) {
         let loop = true;
-        let categoryName = "";
-        this.$store.getters.recipeCategories.forEach(category => {
-          if (category.PK && category.PK.S && loop && category.PK.S == value) {
-            categoryName = category.title.S;
-            loop = false;
+        let categoryNames = [];
+         
+        categories.forEach(recipeCategory => {
+          let findCategoryName = this.$store.getters.recipeCategories.find(data => data.PK.S == recipeCategory.CategoryId.S);
+
+          if (findCategoryName) {
+            categoryNames.push(findCategoryName.title.S);
           }
         });
 
-        return categoryName;
-      },
+        return categoryNames;
+      }
     }
   }
 </script>

@@ -26,8 +26,15 @@
               </b-form-group>
             </b-col>
             <b-col sm="6">
-              <b-form-group id="info-type" label="Ангилал сонгох" label-for="info-type">
-                <b-form-select v-model="form.categoryId" :options="categories"></b-form-select>
+              <b-form-group label="Ангилал сонгох">
+                <multiselect 
+                  v-model="form.categoryValues" 
+                  label="text" 
+                  track-by="value"
+                  :options="categoryOptions" 
+                  :multiple="true" 
+                  :taggable="true"
+                ></multiselect>
               </b-form-group>
             </b-col>
           </b-row>
@@ -96,7 +103,11 @@
 </template>
 
 <script>
+  import Multiselect from 'vue-multiselect';
   export default {
+    components: {
+      Multiselect
+    },
     data() {
       return {
         editorOption: {
@@ -128,7 +139,8 @@
           { value: "category_advice", text: "Зөвлөмж" },
           { value: "category_exercise", text: "Дасгал хөдөлгөөн" }
         ],
-        categories: [],
+        categoryOptions: [],
+        selectedCategories: [],
         isBusy: false,
         loading: false,
         form: {
@@ -136,7 +148,7 @@
           subtitle: "",
           image: null,
           infoType: "",
-          categoryId: "",
+          categoryValues: [],
           content: "",
           featured: "not_accepted"
         },
@@ -172,7 +184,7 @@
 
         let formData = new FormData();
         formData.append("pk", this.$route.params.id);
-        formData.append("categoryId", this.form.categoryId);
+        formData.append("categoryValues", JSON.stringify(this.form.categoryValues));
         formData.append("infoType", this.form.infoType);
         formData.append("title", this.form.title);
         formData.append("subtitle", this.form.subtitle);
@@ -205,29 +217,54 @@
         this.form.title = data.title ? data.title.S : "";
         this.form.subtitle = data.subtitle ? data.subtitle.S : "";
         this.form.content = data.content ? data.content.S : "";
-        this.form.categoryId = data.categoryId ? data.categoryId.S : "";
         this.imageSrc = data.image ? data.image.S : "";
 
         if (data.featured && data.featured.BOOL) {
           this.form.featured = "accepted";
         }
 
+        this.selectedCategories = data.categories;
+        this.updateSelectedCategories();
+
         console.log(data);
       },
       updateCategories(categoryType) {
         this.$store.getters.infoCategories.forEach(category => {
           if (category.type.S == categoryType) {
-            this.categories.push({
+            this.categoryOptions.push({
               value: category.PK.S,
               text: category.title.S
             });  
           }
         });
+
+        this.updateSelectedCategories(categoryType);
+      },
+      updateSelectedCategories(categoryType) {
+        this.selectedCategories.forEach(category => {
+          if (category.CategoryMode && category.CategoryMode.S ) {
+            if (categoryType == category.CategoryMode.S) {
+              this.form.categoryValues.push({
+                text: this.getCategoryName(category.CategoryId.S),
+                value: category.CategoryId.S,
+              });  
+            }  
+          }
+        });
+      },
+      getCategoryName(categoryId) {
+        let find = this.$store.getters.infoCategories.find(data => data.PK.S == categoryId);
+        if (find) {
+          return find.title.S;
+        } else {
+          return categoryId;
+        }
       }
     },
     watch: {
       "form.infoType": function(value) {
-        this.categories = [];
+        this.categoryOptions = [];
+        this.form.categoryValues = [];
         this.updateCategories(value);
       }
     }

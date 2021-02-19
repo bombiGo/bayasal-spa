@@ -135,14 +135,6 @@
       this.updateCategories();
     },
     methods: {
-      updateCategories() {
-        this.$store.getters.recipeCategories.forEach(category => {
-          this.categoryOptions.push({
-            text: category.title.S,
-            value: category.PK.S
-          })
-        });
-      },
       async fetchData() {
         this.isBusy = true;
 
@@ -200,11 +192,11 @@
         this.form.content = data.content ? data.content.S : "";
         this.imageSrc = data.image ? data.image.S : "";
 
-        if (data.categoryValues && data.categoryValues.L) {
-          data.categoryValues.L.forEach(categoryValue => {
+        if (data.categories && data.categories.length > 0) {
+          data.categories.forEach(category => {
             this.form.categoryValues.push({
-              text: categoryValue.M.text.S,
-              value: categoryValue.M.value.S,
+              text: this.getCategoryName(category.CategoryId.S),
+              value: category.CategoryId.S,
             })
           });
         }
@@ -217,6 +209,14 @@
             value: category.PK.S
           });
         });
+      },
+      getCategoryName(categoryId) {
+        let find = this.$store.getters.recipeCategories.find(data => data.PK.S == categoryId);
+        if (find) {
+          return find.title.S;
+        } else {
+          return categoryId;
+        }
       }
     },
     watch: {

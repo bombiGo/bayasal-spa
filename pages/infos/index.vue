@@ -40,7 +40,11 @@
                   </b-badge>
                 </td>
                 <td>
-                  {{ getCategoryName(info.categoryId.S) }}
+                  <div v-if="getCategoryNames(info.PK.S) && getCategoryNames(info.PK.S).length > 0">
+                    <b-badge variant="warning" v-for="(categoryName, index) in getCategoryNames(info.PK.S)" :key="index" class="mr-2">
+                      <span>{{ categoryName }}</span>
+                    </b-badge>
+                  </div>
                 </td>
                 <td>
                   <span v-if="info.featured && info.featured.BOOL">Тийм</span>
@@ -93,6 +97,7 @@
       return {
         loading: false,
         infos: [],
+        infoCategories: [],
         deleteInfo: {
           confirmMessage: "",
           isBusy: false,
@@ -109,12 +114,6 @@
         this.$router.push("/home"); 
       }
     },
-    filters: {
-      formatPrice(value) {
-        let val = (value/1).toFixed(0).replace('.', ',')
-        return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-      }
-    },
     methods: {
       async fetchData() {
         this.loading = true;
@@ -122,15 +121,19 @@
           let response = await this.$axios.get("/infos");
           this.loading = false;
 
-          this.infos = response.data.filter(data => {
-            return data.SK.S === "info"; 
-          });
+          if (response.data.success) {
+            this.infoCategories = response.data.info_categories;
 
-          const categories = response.data.filter(data => {
-            return data.SK.S === "category"; 
-          });
-          
-          this.$store.commit('setInfoCategories', categories);
+            this.infos = response.data.infos.filter(data => {
+              return data.SK.S === "info"; 
+            });
+
+            const categories = response.data.infos.filter(data => {
+              return data.SK.S === "category"; 
+            });
+            
+            this.$store.commit('setInfoCategories', categories);
+          }
         } catch (err) {
           this.loading = false;
           console.log(err);
@@ -140,17 +143,21 @@
         this.deleteInfo.pk = pk;
         this.$refs["delete-modal"].show();
       },
-      getCategoryName(value) {
+      getCategoryNames(infoId) {
         let loop = true;
-        let categoryName = "";
-        this.$store.getters.infoCategories.forEach(category => {
-          if (category.PK && category.PK.S && loop && category.PK.S == value) {
-            categoryName = category.title.S;
-            loop = false;
+        let categoryNames = [];
+         
+        this.infoCategories.forEach(infoCategory => {
+          if (infoId == infoCategory.InfoId.S) {
+            let findCategoryName = this.$store.getters.infoCategories.find(data => data.PK.S == infoCategory.CategoryId.S);
+
+            if (findCategoryName) {
+              categoryNames.push(findCategoryName.title.S);
+            }
           }
         });
 
-        return categoryName;
+        return categoryNames;
       },
       async deleteOk(bvModalEvt) {
         bvModalEvt.preventDefault();

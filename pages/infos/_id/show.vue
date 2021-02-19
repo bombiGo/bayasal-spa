@@ -42,8 +42,12 @@
               </li>
               <li class="mb-0">
                 <p>
-                  <span class="text-muted">Ангилалын нэр: </span> 
-                  <span>{{ getCategoryName(info.categoryId.S) }}</span>
+                  <span class="text-muted">Ангилалууд: </span> 
+                  <div v-if="getCategoryNames(info.categories) && getCategoryNames(info.categories).length > 0">
+                    <b-badge variant="warning" v-for="(categoryName, index) in getCategoryNames(info.categories)" :key="index" class="mr-2">
+                      <span>{{ categoryName }}</span>
+                    </b-badge>
+                  </div>
                 </p>
               </li>
               <li class="mb-0">
@@ -65,7 +69,7 @@
         <b-col m="6">
           <b-card class="shadow border-0">
             <div class="text-muted d-block">Үндсэн мэдээлэл: </div>
-            <div v-html="info.content.S" class="p-3"></div>
+            <div v-html="info.content.S" class="p-3" v-if="info.content && info.content.S"></div>
           </b-card>
         </b-col>
       </b-row>
@@ -101,18 +105,20 @@
           console.log(err);
         }
       },
-      getCategoryName(value) {
+      getCategoryNames(categories) {
         let loop = true;
-        let categoryName = "";
-        this.$store.getters.infoCategories.forEach(category => {
-          if (category.PK && category.PK.S && loop && category.PK.S == value) {
-            categoryName = category.title.S;
-            loop = false;
+        let categoryNames = [];
+         
+        categories.forEach(infoCategory => {
+          let findCategoryName = this.$store.getters.infoCategories.find(data => data.PK.S == infoCategory.CategoryId.S);
+
+          if (findCategoryName) {
+            categoryNames.push(findCategoryName.title.S);
           }
         });
 
-        return categoryName;
-      },
+        return categoryNames;
+      }
     }
   }
 </script>

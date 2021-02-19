@@ -27,11 +27,9 @@
                   </nuxt-link>
                 </td>
                 <td>
-                  <div v-if="recipe.categoryValues && recipe.categoryValues">
-                    <b-badge variant="info" v-for="(categoryValue, index) in recipe.categoryValues.L" :key="index" class="mr-2">
-                      <span v-if="categoryValue && categoryValue.M">
-                        {{ categoryValue.M.text.S }}
-                      </span>
+                  <div v-if="getCategoryNames(recipe.PK.S) && getCategoryNames(recipe.PK.S).length > 0">
+                    <b-badge variant="info" v-for="(categoryName, index) in getCategoryNames(recipe.PK.S)" :key="index" class="mr-2">
+                      <span>{{ categoryName }}</span>
                     </b-badge>
                   </div>
                 </td>
@@ -82,6 +80,7 @@
       return {
         loading: false,
         recipes: [],
+        recipeCategories: [],
         deleteRecipe: {
           confirmMessage: "",
           isBusy: false,
@@ -111,15 +110,20 @@
           let response = await this.$axios.get("/recipes");
           this.loading = false;
 
-          this.recipes = response.data.filter(data => {
-            return data.SK.S === "recipe"; 
-          });
+          if (response.data.success) {
+            this.recipeCategories = response.data.recipe_categories;
 
-          const categories = response.data.filter(data => {
-            return data.SK.S === "category"; 
-          });
+            this.recipes = response.data.recipes.filter(data => {
+              return data.SK.S === "recipe"; 
+            });
+
+            const categories = response.data.recipes.filter(data => {
+              return data.SK.S === "category"; 
+            });
+            
+            this.$store.commit('setRecipeCategories', categories);  
+          }
           
-          this.$store.commit('setRecipeCategories', categories);
         } catch (err) {
           this.loading = false;
           console.log(err);
@@ -129,17 +133,21 @@
         this.deleteRecipe.pk = pk;
         this.$refs["delete-modal"].show();
       },
-      getCategoryName(value) {
+      getCategoryNames(recipeId) {
         let loop = true;
-        let categoryName = "";
-        this.$store.getters.recipeCategories.forEach(category => {
-          if (category.PK && category.PK.S && loop && category.PK.S == value) {
-            categoryName = category.title.S;
-            loop = false;
+        let categoryNames = [];
+         
+        this.recipeCategories.forEach(recipeCategory => {
+          if (recipeId == recipeCategory.RecipeId.S) {
+            let findCategoryName = this.$store.getters.recipeCategories.find(data => data.PK.S == recipeCategory.CategoryId.S);
+
+            if (findCategoryName) {
+              categoryNames.push(findCategoryName.title.S);
+            }
           }
         });
 
-        return categoryName;
+        return categoryNames;
       },
       async deleteOk(bvModalEvt) {
         bvModalEvt.preventDefault();

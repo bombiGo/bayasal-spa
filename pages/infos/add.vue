@@ -26,8 +26,15 @@
               </b-form-group>
             </b-col>
             <b-col sm="6">
-              <b-form-group id="info-type" label="Ангилал сонгох" label-for="info-type">
-                <b-form-select v-model="form.categoryId" :options="categories"></b-form-select>
+              <b-form-group label="Ангилал сонгох">
+                <multiselect 
+                  v-model="form.categoryValues" 
+                  label="text" 
+                  track-by="value"
+                  :options="categoryOptions" 
+                  :multiple="true" 
+                  :taggable="true"
+                ></multiselect>
               </b-form-group>
             </b-col>
           </b-row>
@@ -92,7 +99,12 @@
 </template>
 
 <script>
+  import Multiselect from 'vue-multiselect';
+
 	export default {
+    components: {
+      Multiselect
+    },
     data() {
       return {
         editorOption: {
@@ -124,14 +136,14 @@
           { value: "category_advice", text: "Зөвлөмж" },
           { value: "category_exercise", text: "Дасгал хөдөлгөөн" }
         ],
-        categories: [],
+        categoryOptions: [],
         loading: false,
         form: {
           title: "",
           subtitle: "",
           image: null,
           infoType: "category_news",
-          categoryId: "",
+          categoryValues: [],
           content: "",
           featured: "not_accepted"
         },
@@ -151,7 +163,7 @@
         const uploadedFile = this.form.image ? "uploaded" : "no_upload";
 
         let formData = new FormData();
-        formData.append("categoryId", this.form.categoryId);
+        formData.append("categoryValues", JSON.stringify(this.form.categoryValues));
         formData.append("infoType", this.form.infoType);
         formData.append("title", this.form.title);
         formData.append("subtitle", this.form.subtitle);
@@ -179,9 +191,12 @@
         this.form.content = html
       },
       updateCategories(categoryType) {
+        this.categoryOptions = [];
+        this.form.categoryValues = [];
+        
         this.$store.getters.infoCategories.forEach(category => {
           if (category.type.S == categoryType) {
-            this.categories.push({
+            this.categoryOptions.push({
               value: category.PK.S,
               text: category.title.S
             });  
