@@ -14,6 +14,8 @@
           <b-dropdown-item to="/recipe-categories">Ангилалууд</b-dropdown-item>
           <b-dropdown-item to="/recipes">Бүх жорууд</b-dropdown-item>
         </b-nav-item-dropdown>
+        <b-nav-item to="/users">Хэрэглэгчид</b-nav-item>
+        <b-nav-item to="/orders">Захиалгууд</b-nav-item>
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">
