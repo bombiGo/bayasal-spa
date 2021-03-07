@@ -13,6 +13,7 @@
               <th scope="col">Нэр</th>
               <th scope="col">Үнэ</th>
               <th scope="col">Өдөр</th>
+              <th scope="col">Бүртгэгдсэн</th>
               <th scope="col"></th>
             </tr>
           </thead>
@@ -30,6 +31,9 @@
                 </td>
                 <td>
                   <b-badge pill variant="info" class="p-2">{{ course.day1.S }} өдөр</b-badge>
+                </td>
+                <td>
+                  {{ course.createdAt.S }}
                 </td>
                 <td>
                   <b-button variant="primary" size="sm" class="mb-2" :to="{ name: 'courses-id-edit', params: { id: course.id.S } }">Засах</b-button>
