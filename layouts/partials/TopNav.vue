@@ -14,8 +14,11 @@
           <b-dropdown-item to="/recipe-categories">Ангилалууд</b-dropdown-item>
           <b-dropdown-item to="/recipes">Бүх жорууд</b-dropdown-item>
         </b-nav-item-dropdown>
-        <b-nav-item to="/users">Хэрэглэгчид</b-nav-item>
-        <b-nav-item to="/orders">Захиалгууд</b-nav-item>
+         <b-nav-item-dropdown text="Бусад">
+          <b-dropdown-item to="/users">Хэрэглэгчид</b-dropdown-item>
+          <b-dropdown-item to="/orders">Захиалгууд</b-dropdown-item>
+          <!-- <b-dropdown-item to="/payments">Qpay төлбөрийн жагсаалт</b-dropdown-item> -->
+        </b-nav-item-dropdown>
       </b-navbar-nav>
 
       <b-navbar-nav class="ml-auto">

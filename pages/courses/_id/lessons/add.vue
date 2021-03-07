@@ -70,7 +70,7 @@
               id="input-youtube"
               v-model="form.youtube"
               type="text"
-              placeholder="Youtube url"
+              placeholder="Video"
             ></b-form-input>
           </b-form-group>
 
@@ -153,7 +153,7 @@
         daySelected: 'select',
         contentSelected: 'youtube',
         contentOptions: [
-          { item: 'youtube', name: 'Youtube' },
+          { item: 'youtube', name: 'Видео' },
           { item: 'file', name: 'Файл' },
           { item: 'editor', name: 'Текст зураг' }
         ],
