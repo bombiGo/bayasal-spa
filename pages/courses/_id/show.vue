@@ -64,7 +64,7 @@
         </b-col>
         <b-col m="6">
           <b-card class="shadow border-0">
-            <h5>Хөтөлбөрийн өдрүүд</h5>
+            <h5>Хөтөлбөрийн хичээлүүд</h5>
             <b-button pill variant="success" size="sm" class="mt-1"
               :to="{ name: 'courses-id-lessons-add', params: { id: course.id.S }, query: { title: course.title.S, dayMode: course.dayMode.S, dayNumber: course.day1.S } }"
             >Хичээл нэмэх</b-button>
@@ -73,11 +73,14 @@
               <tr v-for="lesson in course.lessons" :key="lesson.id.S">
                 <td>
                   <div>{{ lesson.title.S }}</div> 
-                  <b-badge variant="primary">
-                    <span v-if="course.dayMode.S === 'select'">
-                      {{ lesson.dayNumber.S }} өдөр
-                    </span>
-                  </b-badge>
+                  <h6 class="mt-3 mb-3">
+                    <b-badge variant="warning">
+                      <span v-if="course.dayMode.S === 'select'">
+                        {{ lesson.dayNumber.S }} өдөр
+                      </span>
+                    </b-badge>
+                  </h6>
+                  <b-button variant="primary" size="sm" class="mb-2" :to="{ name: 'courses-id-lessons-id2-edit', params: { id: course.id.S, id2: lesson.id.S }, query: { title: course.title.S } }">Засах</b-button>
                 </td>
               </tr>
             </table>

@@ -11,6 +11,7 @@
               <th scope="col">Хөтөлбөр</th>
               <th scope="col">Үнэ</th>
               <th scope="col">Төлөв</th>
+              <th scope="col">Төлсөн өдөр</th>
               <th scope="col">Бүртгэгдсэн</th>
               <th scope="col"></th>
             </tr>
@@ -37,6 +38,9 @@
                   <h6 v-else>
                   	<b-badge variant="secondary">Төлбөрийн систем ажиллаагүй</b-badge>
                   </h6>
+                </td>
+                <td>
+                  {{ order.orderPaidDate.S }}
                 </td>
                 <td>
                   <span>{{ order.createdAt.S }}</span>
