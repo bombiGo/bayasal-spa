@@ -74,13 +74,30 @@
                 <td>
                   <div>{{ lesson.title.S }}</div> 
                   <h6 class="mt-3 mb-3">
-                    <b-badge variant="warning">
-                      <span v-if="course.dayMode.S === 'select'">
+                    <b-badge variant="warning" v-if="course.dayMode.S === 'select'">
+                      <span >
                         {{ lesson.dayNumber.S }} өдөр
                       </span>
                     </b-badge>
+                    <div v-else> {{ lesson.dayNumber.S }}</div>
                   </h6>
-                  <b-button variant="primary" size="sm" class="mb-2" :to="{ name: 'courses-id-lessons-id2-edit', params: { id: course.id.S, id2: lesson.id.S }, query: { title: course.title.S } }">Засах</b-button>
+
+                  <p v-if="lesson.locked.BOOL" class="text-muted">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-key" viewBox="0 0 16 16">
+                      <path d="M0 8a4 4 0 0 1 7.465-2H14a.5.5 0 0 1 .354.146l1.5 1.5a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0L13 9.207l-.646.647a.5.5 0 0 1-.708 0L11 9.207l-.646.647a.5.5 0 0 1-.708 0L9 9.207l-.646.647A.5.5 0 0 1 8 10h-.535A4 4 0 0 1 0 8zm4-3a3 3 0 1 0 2.712 4.285A.5.5 0 0 1 7.163 9h.63l.853-.854a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.646-.647a.5.5 0 0 1 .708 0l.646.647.793-.793-1-1h-6.63a.5.5 0 0 1-.451-.285A3 3 0 0 0 4 5z"/>
+                      <path d="M4 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0z"/>
+                    </svg>
+                    Түгжээтэй
+                  </p>
+                  <p v-else class="text-muted">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check2" viewBox="0 0 16 16">
+                      <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                    </svg> 
+                    Түгжээгүй
+                  </p>
+
+                  <b-button variant="primary" size="sm" class="mr-2" :to="{ name: 'courses-id-lessons-id2-edit', params: { id: course.id.S, id2: lesson.id.S }, query: { title: course.title.S, dayMode: course.dayMode.S, dayNumber: course.day1.S } }">Засах</b-button>
+                  <b-button variant="danger" size="sm">Устгах</b-button>
                 </td>
               </tr>
             </table>

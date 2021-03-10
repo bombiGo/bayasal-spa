@@ -18,7 +18,7 @@
         </ol>
       </nav>
 
-      <b-form @submit.prevent="onSubmit">
+      <b-form @submit.prevent="onSubmit" v-if="!isBusy">
         <b-card bg-variant="light" text-variant="dark">
           <template #header>
             <h6 class="float-left">Хичээл засах</h6>
@@ -81,6 +81,32 @@
             ></b-form-file>
           </b-form-group>
 
+          <div class="m-3" v-if="contentSelected === 'youtube'">
+            <iframe :src="'https://player.vimeo.com/video/' + form.youtube" width="360" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+
+          </div>
+
+          <div class="m-3" v-if="contentSelected === 'file' && fileUrl">
+            <img :src="fileUrl" class="img-fluid" style="max-width: 100px;" v-if="checkImageUrl(this.fileUrl)" />
+            <div v-else>
+              <object
+                :data="fileUrl"
+                type="application/pdf"
+                width="500"
+                height="678"
+              >
+                <iframe
+                  :src="fileUrl"
+                  width="300"
+                  height="300"
+                >
+                <p>This browser does not support PDF!</p>
+                </iframe>
+
+              </object>
+            </div>
+          </div>
+          
           <b-form-group
             id="input-duration"
             label="Хугацаа/Хэмжээ"
@@ -112,6 +138,7 @@
           </div>
         </b-card>
       </b-form>
+      <p v-if="isBusy">Уншиж байна ...</p>
 		</div>
 	</div>
 </template>
@@ -148,6 +175,7 @@
         editorOpacity: 0,
         editorPointerEvents: "none",
         loading: false,
+        isBusy: false,
         courseDayNumber: 0,
         courseDayCalendar: "",
         daySelected: 'select',
@@ -157,6 +185,7 @@
           { item: 'file', name: 'Файл' },
           { item: 'editor', name: 'Текст зураг' }
         ],
+        fileUrl: "",
         form: {
           title: "",
           dayNumber: "",
@@ -172,6 +201,7 @@
     created() {
       this.fetchData();
 
+      this.daySelected = this.$route.query.dayMode;
       if (this.$route.query.dayMode === "select") {
         // is number
         if (!isNaN(this.$route.query.dayNumber)) {
@@ -197,6 +227,9 @@
           if (response.data) {
             this.setFormData(response.data);
           } 
+
+          console.log("fetch loaded");
+
           this.isBusy = false;
         } catch (err) {
           this.isBusy = false;
@@ -205,10 +238,31 @@
       },
       setFormData(data) {
         this.form.title = data.title ? data.title.S : "";
-        
+        this.form.dayNumber = data.dayNumber ? parseInt(data.dayNumber.S) : "";
+        this.form.duration = data.duration ? data.duration.S : "";
+        this.form.locked = data.locked ? new Boolean(data.locked.BOOL) : "";
+
+        if (data.contentMode && data.contentMode.S) {
+          this.contentSelected = data.contentMode.S;
+
+          if (this.contentSelected == "youtube") {
+            this.form.youtube = data.youtube.S;
+          } 
+
+          if (this.contentSelected == "editor") {
+            this.form.content = data.content.S;
+          }
+
+          if (this.contentSelected == "file") {
+            this.fileUrl = data.file.S;
+          }
+        }
       },
       onEditorChange({editor,html,text}) {
         this.form.content = html
+      },
+      checkImageUrl(url) {
+        return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
       },
       async onSubmit() {
         this.loading = true;
@@ -236,16 +290,17 @@
         formData.append("locked", this.form.locked);
         formData.append("duration", this.form.duration);
 
-        try {
-          let response = await this.$axios.post("/lessons", formData, headers);
-          if (response.data.success) {
-            this.$router.push({ name: 'courses-id-show', params: { id: this.$route.params.id }});
-          }
-          this.loading = false;
-        } catch (err) {
-          this.loading = false;
-          console.log(err);
-        }
+        console.log(formData);
+        // try {
+        //   let response = await this.$axios.post("/lessons", formData, headers);
+        //   if (response.data.success) {
+        //     this.$router.push({ name: 'courses-id-show', params: { id: this.$route.params.id }});
+        //   }
+        //   this.loading = false;
+        // } catch (err) {
+        //   this.loading = false;
+        //   console.log(err);
+        // }
       }
     },
     watch: {

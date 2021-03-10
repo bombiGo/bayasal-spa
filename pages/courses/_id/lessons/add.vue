@@ -170,6 +170,8 @@
       }
     },
     created() {
+      this.form.dayMode = this.$route.query.dayMode;
+      
       if (this.$route.query.dayMode === "select") {
         // is number
         if (!isNaN(this.$route.query.dayNumber)) {
