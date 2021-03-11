@@ -81,9 +81,8 @@
             ></b-form-file>
           </b-form-group>
 
-          <div class="m-3" v-if="contentSelected === 'youtube'">
+          <div class="m-3" v-if="contentSelected === 'youtube' && form.youtube">
             <iframe :src="'https://player.vimeo.com/video/' + form.youtube" width="360" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
-
           </div>
 
           <div class="m-3" v-if="contentSelected === 'file' && fileUrl">
@@ -322,9 +321,9 @@
           this.form.file = null;
         }
 
-        if (val !== "youtube") {
-          this.form.youtube = "";
-        }
+        // if (val !== "youtube") {
+        //   this.form.youtube = "";
+        // }
       }
     }
 	}
