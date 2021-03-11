@@ -193,7 +193,7 @@
           file: null,
           youtube: "",
           duration: "",
-          locked: "locked"
+          locked: "unlocked"
         }
       }
     },
@@ -210,7 +210,7 @@
     },
     filters: {
       truncate: function (text, length, suffix) {
-        if (text.length > length) {
+        if (text.length > length) {``
           return text.substring(0, length) + suffix;
         } else {
           return text;
@@ -239,8 +239,11 @@
         this.form.title = data.title ? data.title.S : "";
         this.form.dayNumber = data.dayNumber ? parseInt(data.dayNumber.S) : "";
         this.form.duration = data.duration ? data.duration.S : "";
-        this.form.locked = data.locked ? new Boolean(data.locked.BOOL) : "";
 
+        if (data.locked && data.locked.BOOL) {
+          this.form.locked = new Boolean(data.locked.BOOL) ? "locked" : "unlocked";  
+        }
+        
         if (data.contentMode && data.contentMode.S) {
           this.contentSelected = data.contentMode.S;
 
@@ -264,7 +267,7 @@
         return (url.match(/\.(jpeg|jpg|gif|png)$/) != null);
       },
       async onSubmit() {
-        this.loading = true;
+        // this.loading = true;
         const headers = {
           "Content-Type": "multipart/form-data"
         };
@@ -276,30 +279,33 @@
         }
 
         let formData = new FormData();
-        formData.append("courseId", this.$route.params.id);
+        formData.append("pk", this.$route.params.id2);
         formData.append("title", this.form.title);
+        formData.append("contentMode", this.contentSelected);
         formData.append("file", this.form.file);
         formData.append("fileUpload", uploadedFile);
-        formData.append("content", this.form.content);
+        formData.append("oldFile", this.fileUrl);
         formData.append("youtube", this.form.youtube);
-        formData.append("contentMode", this.contentSelected);
         formData.append("content", this.form.content);
         formData.append("dayNumber", this.form.dayNumber);
         formData.append("dayCalendar", this.form.dayCalendar);
         formData.append("locked", this.form.locked);
         formData.append("duration", this.form.duration);
 
-        console.log(formData);
-        // try {
-        //   let response = await this.$axios.post("/lessons", formData, headers);
-        //   if (response.data.success) {
-        //     this.$router.push({ name: 'courses-id-show', params: { id: this.$route.params.id }});
-        //   }
-        //   this.loading = false;
-        // } catch (err) {
-        //   this.loading = false;
-        //   console.log(err);
-        // }
+        try {
+          let response = await this.$axios.post("/lessons/edit", formData, headers);
+          
+          if (response.data.success) {
+            this.$router.push({ name: '/courses-id-show', params: { id: this.$route.params.id } });
+          } else {
+            alert("Lesson update error");
+          }
+          this.loading = false;
+          console.log(response);
+        } catch (err) {
+          this.loading = false;
+          console.log(err);
+        }
       }
     },
     watch: {
