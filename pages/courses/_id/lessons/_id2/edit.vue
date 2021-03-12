@@ -210,7 +210,7 @@
     },
     filters: {
       truncate: function (text, length, suffix) {
-        if (text.length > length) {``
+        if (text.length > length) {
           return text.substring(0, length) + suffix;
         } else {
           return text;
@@ -226,8 +226,6 @@
           if (response.data) {
             this.setFormData(response.data);
           } 
-
-          console.log("fetch loaded");
 
           this.isBusy = false;
         } catch (err) {
@@ -332,5 +330,5 @@
         // }
       }
     }
-	}
+	};
 </script>
