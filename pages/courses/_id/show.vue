@@ -97,7 +97,7 @@
                   </p>
 
                   <b-button variant="primary" size="sm" class="mr-2" :to="{ name: 'courses-id-lessons-id2-edit', params: { id: course.id.S, id2: lesson.id.S }, query: { title: course.title.S, dayMode: course.dayMode.S, dayNumber: course.day1.S } }">Засах</b-button>
-                  <b-button variant="danger" size="sm">Устгах</b-button>
+                  <b-button variant="danger" size="sm" @click="remove(lesson.id.S)">Устгах</b-button>
                 </td>
               </tr>
             </table>
@@ -105,6 +105,30 @@
         </b-col>
       </b-row>
 		</div>
+
+    <b-modal 
+        ref="delete-modal" 
+        size="sm" 
+        title="Хичээл устгах уу"
+        
+      >
+        <input type="text" v-model="deleteLesson.confirmMessage" placeholder="permanently delete" class="form-control">
+        <template #modal-footer>
+          <div class="w-100">
+            <b-button
+              variant="primary"
+              size="md"
+              class="float-right"
+              @click="deleteOk"
+              :disabled="deleteLesson.disabled"
+            >
+              <b-spinner small v-if="deleteLesson.isBusy"></b-spinner>
+              <span class="sr-only" v-if="deleteLesson.isBusy">Loading...</span>
+              <span v-if="!deleteLesson.isBusy">Устгах</span>
+            </b-button>
+          </div>
+        </template>
+      </b-modal>
 	</div>
 </template>
 
@@ -113,7 +137,13 @@
     data() {
       return {
         loading: false,
-        course: null
+        course: null,
+        deleteLesson: {
+          confirmMessage: "",
+          isBusy: false,
+          pk: "",
+          disabled: true
+        }
       }
     },
     created() {
@@ -140,6 +170,45 @@
         } catch (err) {
           this.loading = false;
           console.log(err);
+        }
+      },
+      remove(pk) {
+        this.deleteLesson.pk = pk;
+        this.$refs["delete-modal"].show();
+      },
+      async deleteOk(bvModalEvt) {
+        bvModalEvt.preventDefault();
+
+        if (this.deleteLesson.pk) {
+          this.deleteLesson.confirmMessage = "";
+          this.deleteLesson.isBusy = true;
+          try {
+            let response = await this.$axios.delete("/lessons?pk=" + this.deleteLesson.pk);
+            this.deleteLesson.isBusy = false;
+            
+            if (response.data.success) {
+              this.$refs["delete-modal"].hide();
+              this.fetchData();
+            } else {
+              alert("Lesson delete error");
+            }
+            console.log(response);
+
+          } catch (err) {
+            this.deleteLesson.isBusy = false;
+            console.log(err);
+          }
+        } else {
+          alert("Lesson delete error");
+        }
+      }
+    },
+    watch: {
+      "deleteLesson.confirmMessage": function(value) {
+        if (value === "permanently delete") {
+          this.deleteLesson.disabled = false;
+        } else {
+          this.deleteLesson.disabled = true;
         }
       }
     }

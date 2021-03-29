@@ -294,7 +294,7 @@
           let response = await this.$axios.post("/lessons/edit", formData, headers);
           
           if (response.data.success) {
-            this.$router.push({ name: '/courses-id-show', params: { id: this.$route.params.id } });
+            this.$router.push({ name: 'courses-id-show', params: { id: this.$route.params.id } });
           } else {
             alert("Lesson update error");
           }
@@ -320,14 +320,6 @@
           this.editorHeight = 0;
           this.editorPointerEvents = "none";
         }
-
-        if (val !== "file") {
-          this.form.file = null;
-        }
-
-        // if (val !== "youtube") {
-        //   this.form.youtube = "";
-        // }
       }
     }
 	};
